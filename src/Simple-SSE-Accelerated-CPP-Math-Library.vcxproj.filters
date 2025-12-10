@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Math">
+      <UniqueIdentifier>{c921a3f4-13bd-4da8-82e5-41e3afac2eea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Implementation">
+      <UniqueIdentifier>{2fafe26c-3059-49dd-a377-f507cc7de404}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Implementation\Data types">
+      <UniqueIdentifier>{46e8c4fd-94aa-49ea-97de-fb733b511228}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Implementation\Data types\Vectors">
+      <UniqueIdentifier>{cd424129-9723-4aff-8ec0-c56b3c85262d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Implementation\Data types\Vectors\Float">
+      <UniqueIdentifier>{88449c68-60b3-462a-8b38-e9e32aae3214}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Implementation\Data types\Vectors\Half">
+      <UniqueIdentifier>{18f6a468-640b-48b4-8370-180179015ccd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Implementation\Data types\Matrices">
+      <UniqueIdentifier>{904ee870-9940-4eef-931e-c25f4432700d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Implementation\Data types\Quaternion">
+      <UniqueIdentifier>{c13195ca-684e-48fb-a683-0ce93be3b917}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demo">
+      <UniqueIdentifier>{bd5d46af-86f7-4b76-a6c8-2c4c317e976c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MathAPI\MathAPI.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_config.h">
+      <Filter>Math\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_constants.h">
+      <Filter>Math\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_fast_functions.h">
+      <Filter>Math\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_functions.h">
+      <Filter>Math\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_float2.h">
+      <Filter>Math\Implementation\Data types\Vectors\Float</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_float3.h">
+      <Filter>Math\Implementation\Data types\Vectors\Float</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_float4.h">
+      <Filter>Math\Implementation\Data types\Vectors\Float</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_half.h">
+      <Filter>Math\Implementation\Data types\Vectors\Half</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_half2.h">
+      <Filter>Math\Implementation\Data types\Vectors\Half</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_half3.h">
+      <Filter>Math\Implementation\Data types\Vectors\Half</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_half4.h">
+      <Filter>Math\Implementation\Data types\Vectors\Half</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_float3x3.h">
+      <Filter>Math\Implementation\Data types\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_float4x4.h">
+      <Filter>Math\Implementation\Data types\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_quaternion.h">
+      <Filter>Math\Implementation\Data types\Quaternion</Filter>
+    </ClInclude>
+    <ClInclude Include="MathAPI\math_float2x2.h">
+      <Filter>Math\Implementation\Data types\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="Demo\benchmark.h">
+      <Filter>Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="Demo\autotests.h">
+      <Filter>Demo</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MathAPI\math_float2.inl">
+      <Filter>Math\Implementation\Data types\Vectors\Float</Filter>
+    </None>
+    <None Include="MathAPI\math_float3.inl">
+      <Filter>Math\Implementation\Data types\Vectors\Float</Filter>
+    </None>
+    <None Include="MathAPI\math_float4.inl">
+      <Filter>Math\Implementation\Data types\Vectors\Float</Filter>
+    </None>
+    <None Include="MathAPI\math_float2x2.inl">
+      <Filter>Math\Implementation\Data types\Matrices</Filter>
+    </None>
+    <None Include="MathAPI\math_float3x3.inl">
+      <Filter>Math\Implementation\Data types\Matrices</Filter>
+    </None>
+    <None Include="MathAPI\math_float4x4.inl">
+      <Filter>Math\Implementation\Data types\Matrices</Filter>
+    </None>
+    <None Include="MathAPI\math_half2.inl">
+      <Filter>Math\Implementation\Data types\Vectors\Half</Filter>
+    </None>
+    <None Include="MathAPI\math_half3.inl">
+      <Filter>Math\Implementation\Data types\Vectors\Half</Filter>
+    </None>
+    <None Include="MathAPI\math_half4.inl">
+      <Filter>Math\Implementation\Data types\Vectors\Half</Filter>
+    </None>
+  </ItemGroup>
+</Project>
