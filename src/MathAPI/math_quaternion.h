@@ -305,51 +305,55 @@ namespace Math
          */
         static quaternion from_matrix(const float3x3& matrix) noexcept
         {
-            const float3 col0 = matrix.col0();
-            const float3 col1 = matrix.col1();
-            const float3 col2 = matrix.col2();
+            const float m00 = matrix.row0().x;
+            const float m01 = matrix.row0().y;
+            const float m02 = matrix.row0().z;
 
-            const float m00 = col0.x, m01 = col1.x, m02 = col2.x;
-            const float m10 = col0.y, m11 = col1.y, m12 = col2.y;
-            const float m20 = col0.z, m21 = col1.z, m22 = col2.z;
+            const float m10 = matrix.row1().x;
+            const float m11 = matrix.row1().y;
+            const float m12 = matrix.row1().z;
+
+            const float m20 = matrix.row2().x;
+            const float m21 = matrix.row2().y;
+            const float m22 = matrix.row2().z;
 
             float trace = m00 + m11 + m22;
             float x, y, z, w;
 
             if (trace > 0.0f) {
-                float s = std::sqrt(trace + 1.0f) * 2.0f;
+                float s = std::sqrt(trace + 1.0f) * 2.0f; // S = 4 * w
+                float inv_s = 1.0f / s;
                 w = 0.25f * s;
-                x = (m21 - m12) / s;
-                y = (m02 - m20) / s;
-                z = (m10 - m01) / s;
-
-                // ИСПРАВЛЕНИЕ: для нашей системы координат инвертируем знак Z
-                z = -z;
+                x = (m21 - m12) * inv_s;
+                y = (m02 - m20) * inv_s;
+                z = (m10 - m01) * inv_s;
             }
-            else if (m00 > m11 && m00 > m22) {
-                float s = std::sqrt(1.0f + m00 - m11 - m22) * 2.0f;
-                w = (m21 - m12) / s;
+            else if ((m00 > m11) && (m00 > m22)) {
+                float s = std::sqrt(1.0f + m00 - m11 - m22) * 2.0f; // S = 4 * x
+                float inv_s = 1.0f / s;
+                w = (m21 - m12) * inv_s;
                 x = 0.25f * s;
-                y = (m01 + m10) / s;
-                z = (m02 + m20) / s;
+                y = (m01 + m10) * inv_s;
+                z = (m02 + m20) * inv_s;
             }
             else if (m11 > m22) {
-                float s = std::sqrt(1.0f + m11 - m00 - m22) * 2.0f;
-                w = (m02 - m20) / s;
-                x = (m01 + m10) / s;
+                float s = std::sqrt(1.0f + m11 - m00 - m22) * 2.0f; // S = 4 * y
+                float inv_s = 1.0f / s;
+                w = (m02 - m20) * inv_s;
+                x = (m01 + m10) * inv_s;
                 y = 0.25f * s;
-                z = (m12 + m21) / s;
+                z = (m12 + m21) * inv_s;
             }
             else {
-                float s = std::sqrt(1.0f + m22 - m00 - m11) * 2.0f;
-                w = (m10 - m01) / s;
-                x = (m02 + m20) / s;
-                y = (m12 + m21) / s;
+                float s = std::sqrt(1.0f + m22 - m00 - m11) * 2.0f; // S = 4 * z
+                float inv_s = 1.0f / s;
+                w = (m10 - m01) * inv_s;
+                x = (m02 + m20) * inv_s;
+                y = (m12 + m21) * inv_s;
                 z = 0.25f * s;
             }
-
-            quaternion result(x, y, z, w);
-            return result.normalize();
+            
+            return quaternion(x, y, z, w);
         }
 
         /**
@@ -1142,8 +1146,6 @@ namespace Math
     inline quaternion nlerp(const quaternion& a, const quaternion& b, float t) noexcept
     {
         const float cos_angle = dot(a, b);
-
-        // Use the closer quaternion (account for double cover)
         const float sign = (cos_angle < 0.0f) ? -1.0f : 1.0f;
 
         // SSE-optimized lerp
@@ -1152,12 +1154,20 @@ namespace Math
         __m128 t_vec = _mm_set1_ps(t);
         __m128 one_minus_t = _mm_set1_ps(1.0f - t);
 
+        // result = a(1-t) + b*sign*t
         __m128 result = _mm_add_ps(_mm_mul_ps(a_simd, one_minus_t), _mm_mul_ps(b_simd, t_vec));
 
-        // Normalize using rsqrt for better performance (less accurate but faster)
+        // Normalize using rsqrt + Newton-Raphson step for precision
         __m128 len_sq = _mm_dp_ps(result, result, 0xFF);
-        __m128 inv_len = _mm_rsqrt_ps(len_sq);
-        result = _mm_mul_ps(result, inv_len);
+        __m128 rsqrt = _mm_rsqrt_ps(len_sq);
+
+        // Newton-Raphson: y = y * (1.5 - 0.5 * x * y * y)
+        __m128 half_x = _mm_mul_ps(len_sq, _mm_set1_ps(0.5f));
+        __m128 rsqrt_sq = _mm_mul_ps(rsqrt, rsqrt);
+        __m128 adj = _mm_sub_ps(_mm_set1_ps(1.5f), _mm_mul_ps(half_x, rsqrt_sq));
+        __m128 precise_inv_len = _mm_mul_ps(rsqrt, adj);
+
+        result = _mm_mul_ps(result, precise_inv_len);
 
         return quaternion(result);
     }
@@ -1176,55 +1186,34 @@ namespace Math
         if (t >= 1.0f) return b;
 
         float cos_angle = dot(a, b);
+        quaternion b_target = b;
 
-        // Handle negative dot product (take shortest path)
-        quaternion b_adj = b;
+        // Handle negative dot product (take shortest path) first
         if (cos_angle < 0.0f) {
+            b_target = -b;
             cos_angle = -cos_angle;
-            b_adj = -b;
         }
 
-        // Special case: opposite quaternions (cos_angle ≈ -1 after adjustment becomes ≈ 1)
-        // This is the case that's failing the test
-        const float OPPOSITE_THRESHOLD = -0.9999f;
-        float original_cos_angle = dot(a, b); // Get original before adjustment
-        if (original_cos_angle < OPPOSITE_THRESHOLD) {
-            // When quaternions are nearly opposite, we need to choose an arbitrary axis
-            // This is a standard solution for the opposite quaternion case
-            quaternion perp = quaternion(-a.y, a.x, -a.w, a.z); // perpendicular quaternion
-            perp = perp.normalize();
+        const float THRESHOLD = 0.9995f;
 
-            // Interpolate through the perpendicular
-            if (t < 0.5f) {
-                return slerp(a, perp, t * 2.0f);
-            }
-            else {
-                return slerp(perp, b_adj, (t - 0.5f) * 2.0f);
-            }
+        // Case 1: Quaternions are very close -> Use Linear Interpolation (more stable than sin(0)/0)
+        if (cos_angle > THRESHOLD) {
+            return nlerp(a, b_target, t);
         }
 
-        // Fast path: use NLERP when quaternions are very close
-        const float ALMOST_ONE = 0.99999f;
-        if (cos_angle > ALMOST_ONE) {
-            return nlerp(a, b_adj, t);
-        }
+        // Case 2: Standard SLERP
+        // cos_angle clamped safely to [-1, 1] although logically here it is [0, 1]
+        cos_angle = std::min(std::max(cos_angle, -1.0f), 1.0f);
 
-        // Clamp for safety
-        cos_angle = std::min(cos_angle, 1.0f);
-
-        // Standard SLERP
-        float angle = FastMath::fast_acos(cos_angle);
+        float angle = std::acos(cos_angle);
         float sin_angle = std::sin(angle);
+        float inv_sin = 1.0f / sin_angle;
 
-        // Avoid division by zero
-        if (sin_angle < 1e-8f) {
-            return nlerp(a, b_adj, t);
-        }
+        float ratio_a = std::sin((1.0f - t) * angle) * inv_sin;
+        float ratio_b = std::sin(t * angle) * inv_sin;
 
-        float ratio_a = std::sin((1.0f - t) * angle) / sin_angle;
-        float ratio_b = std::sin(t * angle) / sin_angle;
-
-        return (a * ratio_a + b_adj * ratio_b).normalize();
+        // Use pure multiply-add
+        return (a * ratio_a + b_target * ratio_b);
     }
 
     /**
