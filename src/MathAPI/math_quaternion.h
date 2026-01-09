@@ -426,6 +426,46 @@ namespace Math
         }
 
         /**
+         * @brief Create rotation quaternion looking in forward direction
+         * @param forward Direction to look at (will be normalized)
+         * @param up Up vector
+         * @return Quaternion representing the rotation
+         */
+        static quaternion look_rotation(const float3& forward, const float3& up) noexcept
+        {
+            // 1. Нормализуем направление взгляда (Forward / Z axis)
+            float3 f = forward.normalize();
+
+            // Защита от вырожденного вектора
+            if (f.length_sq() < 1e-6f)
+                return identity();
+
+            // 2. Вычисляем правый вектор (Right / X axis) через векторное произведение
+            // Используем cross(Up, Forward) для левосторонней системы (DirectX)
+            float3 r = Math::cross(up, f).normalize();
+
+            // Защита: если взгляд совпадает с вектором вверх (или противоположен)
+            if (r.length_sq() < 1e-6f)
+            {
+                // Пытаемся использовать альтернативный вектор вверх (например, глобальный X)
+                r = Math::cross(float3::unit_x(), f).normalize();
+                // Если и это не помогло (смотрим вдоль X), берем Z
+                if (r.length_sq() < 1e-6f)
+                    r = Math::cross(float3::unit_z(), f).normalize();
+            }
+
+            // 3. Пересчитываем вектор вверх (Up / Y axis), чтобы он был строго перпендикулярен
+            float3 u = Math::cross(f, r);
+
+            // 4. Создаем матрицу вращения 3x3 из базисных векторов (строки матрицы)
+            // Предполагается, что конструктор float3x3 принимает строки (row0, row1, row2)
+            float3x3 rotMat(r, u, f);
+
+            // 5. Конвертируем матрицу в кватернион
+            return from_matrix(rotMat);
+        }
+
+        /**
          * @brief Create rotation quaternion around X axis
          * @param angle Rotation angle in radians
          * @return Quaternion representing rotation around X axis
