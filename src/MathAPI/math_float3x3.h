@@ -32,7 +32,7 @@ namespace Math
      * @note SSE optimized for performance-critical operations
      * @note Perfect for 3D transformations, normal matrices, and linear algebra
      */
-    class MATH_API float3x3
+    class float3x3
     {
     public:
         // Store matrix as three float4 for alignment and SSE optimization

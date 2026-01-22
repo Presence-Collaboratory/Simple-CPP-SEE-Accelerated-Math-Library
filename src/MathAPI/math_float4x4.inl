@@ -175,17 +175,6 @@ namespace Math
         row3_.set_simd(row3);
     }
 
-#if defined(MATH_SUPPORT_D3DX)
-    /**
-     * @brief Construct from D3DXMATRIX
-     */
-    inline float4x4::float4x4(const D3DXMATRIX& mat) noexcept
-        : row0_(mat._11, mat._12, mat._13, mat._14)
-        , row1_(mat._21, mat._22, mat._23, mat._24)
-        , row2_(mat._31, mat._32, mat._33, mat._34)
-        , row3_(mat._41, mat._42, mat._43, mat._44) {}
-#endif
-
     // ============================================================================
     // Static Constructors
     // ============================================================================
@@ -1099,17 +1088,6 @@ namespace Math
     inline bool float4x4::operator!=(const float4x4& rhs) const noexcept {
         return !(*this == rhs);
     }
-
-#if defined(MATH_SUPPORT_D3DX)
-    inline float4x4::operator D3DXMATRIX() const noexcept {
-        D3DXMATRIX result;
-        result._11 = row0_.x; result._12 = row0_.y; result._13 = row0_.z; result._14 = row0_.w;
-        result._21 = row1_.x; result._22 = row1_.y; result._23 = row1_.z; result._24 = row1_.w;
-        result._31 = row2_.x; result._32 = row2_.y; result._33 = row2_.z; result._34 = row2_.w;
-        result._41 = row3_.x; result._42 = row3_.y; result._43 = row3_.z; result._44 = row3_.w;
-        return result;
-    }
-#endif
 
     // ============================================================================
     // Binary Operators

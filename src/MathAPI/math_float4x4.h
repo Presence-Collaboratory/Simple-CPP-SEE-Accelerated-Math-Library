@@ -33,7 +33,7 @@ namespace Math
      * @note Full SSE optimization for performance-critical operations
      * @note Perfect for 3D transformations, view/projection matrices, and linear algebra
      */
-    class MATH_API float4x4
+    class float4x4
     {
     public:
         // Store matrix as four float4 rows for alignment and SSE optimization
@@ -119,15 +119,6 @@ namespace Math
          * @note Uses SSE optimization for efficient conversion
          */
         explicit float4x4(const quaternion& q) noexcept;
-
-#if defined(MATH_SUPPORT_D3DX)
-        /**
-         * @brief Construct from D3DXMATRIX
-         * @param mat DirectX matrix
-         * @note Converts from DirectX to internal row-major storage
-         */
-        float4x4(const D3DXMATRIX& mat) noexcept;
-#endif
 
         // ============================================================================
         // Static Constructors
@@ -750,15 +741,6 @@ namespace Math
          * @return True if matrices are not approximately equal
          */
         bool operator!=(const float4x4& rhs) const noexcept;
-
-#if defined(MATH_SUPPORT_D3DX)
-        /**
-         * @brief Convert to D3DXMATRIX
-         * @return D3DXMATRIX equivalent
-         * @note Converts to DirectX row-major format
-         */
-        operator D3DXMATRIX() const noexcept;
-#endif
     };
 
     // ============================================================================

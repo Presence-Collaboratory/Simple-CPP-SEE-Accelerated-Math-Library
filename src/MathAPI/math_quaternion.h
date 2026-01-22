@@ -25,10 +25,6 @@ namespace Math
     class float4x4;
 }
 
-#if defined(MATH_SUPPORT_D3DX)
-#include <d3dx9.h>
-#endif
-
 ///////////////////////////////////////////////////////////////
 namespace Math
 {
@@ -36,7 +32,7 @@ namespace Math
     // Fwd Declaration
     // ============================================================================
 
-    class MATH_API quaternion;
+    class quaternion;
 
     inline quaternion operator+(quaternion lhs, const quaternion& rhs) noexcept;
     inline quaternion operator-(quaternion lhs, const quaternion& rhs) noexcept;
@@ -58,7 +54,7 @@ namespace Math
      * 3D rotations and orientations. Leverages float4's SSE optimization and
      * mathematical operations for better performance and code consistency.
      */
-    class MATH_API quaternion
+    class quaternion
     {
     public:
         // Union for direct component access and SSE optimization
@@ -168,14 +164,6 @@ namespace Math
             *this = from_matrix(matrix);
         }
 
-#if defined(MATH_SUPPORT_D3DX)
-        /**
-         * @brief Construct from D3DXQUATERNION
-         * @param q DirectX quaternion
-         */
-        quaternion(const D3DXQUATERNION& q) noexcept : data_(q.x, q.y, q.z, q.w) {}
-#endif
-
         quaternion(const quaternion&) noexcept = default;
 
         // ============================================================================
@@ -183,19 +171,6 @@ namespace Math
         // ============================================================================
 
         quaternion& operator=(const quaternion&) noexcept = default;
-
-#if defined(MATH_SUPPORT_D3DX)
-        /**
-         * @brief Assignment operator from D3DXQUATERNION
-         * @param q DirectX quaternion to assign
-         * @return Reference to this quaternion
-         */
-        quaternion& operator=(const D3DXQUATERNION& q) noexcept
-        {
-            data_ = float4(q.x, q.y, q.z, q.w);
-            return *this;
-        }
-#endif
 
         /**
          * @brief Assignment operator from float4
@@ -371,18 +346,6 @@ namespace Math
             );
             return from_matrix(rot_matrix);
         }
-
-#if defined(MATH_SUPPORT_D3DX)
-        /**
-         * @brief Create quaternion from D3DXQUATERNION
-         * @param q DirectX quaternion
-         * @return Math::quaternion equivalent
-         */
-        static quaternion from_d3dxquaternion(const D3DXQUATERNION& q) noexcept
-        {
-            return quaternion(q);
-        }
-#endif
 
         /**
          * @brief Create rotation quaternion that rotates from one direction to another
@@ -598,22 +561,6 @@ namespace Math
         // ============================================================================
         // Conversion Operators
         // ============================================================================
-
-#if defined(MATH_SUPPORT_D3DX)
-        /**
-         * @brief Convert to D3DXQUATERNION
-         * @return DirectX quaternion equivalent
-         */
-        operator D3DXQUATERNION() const noexcept
-        {
-            D3DXQUATERNION result;
-            result.x = x;
-            result.y = y;
-            result.z = z;
-            result.w = w;
-            return result;
-        }
-#endif
 
         /**
          * @brief Convert to float4 vector

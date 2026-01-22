@@ -28,7 +28,7 @@ namespace Math
      * @note SSE optimization for performance-critical operations
      * @note Perfect for 2D transformations, linear algebra, and computer vision
      */
-    class MATH_API float2x2
+    class float2x2
     {
     private:
         alignas(16) float2 col0_;  // First column: [m00, m10]
